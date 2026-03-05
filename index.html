@@ -174,8 +174,13 @@
                     });
 
                     const text = await res.text();
-                    document.getElementById("result").innerText =
-                        "Status: " + res.status + "\n\n" + text;
+                    if (res.status === 201) {
+                        document.getElementById("result").innerText = "Successfully joined planet!";
+                    } else if (res.status === 400) {
+                        document.getElementById("result").innerText = "Bot already in planet!"
+                    } else {
+                        document.getElementById("result").innerText = "Status: " + res.status + "\n\n" + text;
+                    }
                 } catch (err) {
                     document.getElementById("result").innerText = err;
                 }
