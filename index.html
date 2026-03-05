@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Valour Planet Joiner</title>
+        <style>
+            body {
+                background: #0f172a;
+                color: white;
+                font-family: Arial;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .container {
+                background: #1e293b;
+                padding: 30px;
+                border-radius: 10px;
+                width: 420px;
+            }
+
+            input {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: none;
+                border-radius: 5px;
+                box-sizing: border-box;
+                background: #424d5f;
+                color: #000000;
+            }
+
+            input:disabled {
+                background: #374151;
+                color: #9ca3af;
+            }
+
+            button {
+                width: 100%;
+                padding: 10px;
+                background: #4f46e5;
+                border: none;
+                border-radius: 5px;
+                color: white;
+                cursor: pointer;
+            }
+
+            #result {
+                margin-top: 10px;
+                white-space: pre-wrap;
+                font-size: 13px;
+            }
+
+            footer {
+                margin-top: 20px;
+                font-size: 12px;
+                color: #64748b;
+                text-align: center;
+            }
+
+            footer a {
+                color: #818cf8;
+                text-decoration: none;
+            }
+
+            footer a:hover {
+                text-decoration: underline;
+            }
+
+            footer .divider {
+                margin: 0 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Valour Planet Join Tool</h2>
+            <input id="token" placeholder="Bot Token - THIS IS NEVER STORED">
+            <input id="planetId" placeholder="Planet ID">
+            <input id="inviteCode" placeholder="Invite Code - Not required if planet is discoverable">
+            <button onclick="joinPlanet()">Join Planet</button>
+            <div id="result"></div>
+        </div>
+
+        <footer>
+            <div>
+                &copy; 2026 Valour Planet Joiner. Not affiliated with Valour.
+            </div>
+            <div style="margin-top: 6px;">
+                <a href="README.md" target="_blank">README</a>
+                <span class="divider">&bull;</span>
+                <a href="PRIVACY.md" target="_blank">Privacy Policy</a>
+                <span class="divider">&bull;</span>
+                <a href="https://github.com" target="_blank">GitHub</a>
+            </div>
+        </footer>
+
+        <script>
+            let debounceTimer = null;
+
+            document.getElementById("planetId").addEventListener("input", function () {
+                clearTimeout(debounceTimer);
+                const inviteBox = document.getElementById("inviteCode");
+                inviteBox.disabled = false;
+                inviteBox.placeholder = "Checking planet...";
+                debounceTimer = setTimeout(checkDiscoverable, 1500);
+            });
+
+            async function checkDiscoverable() {
+                const token = document.getElementById("token").value;
+                const planetId = document.getElementById("planetId").value;
+                const inviteBox = document.getElementById("inviteCode");
+                const resultBox = document.getElementById("result");
+
+                if (!token || !planetId) {
+                    inviteBox.disabled = false;
+                    inviteBox.placeholder = "Invite Code - Not required if planet is discoverable";
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`https://api.valour.gg/api/planets/discoverable`, {
+                        method: "GET",
+                        headers: {
+                            Authorization: `${token}`,
+                            accept: "*/*"
+                        }
+                    });
+
+                    const planets = await res.json();
+                    const isDiscoverable = planets.some(p => String(p.planetId) === String(planetId));
+
+                    if (isDiscoverable) {
+                        inviteBox.disabled = true;
+                        inviteBox.value = "";
+                        inviteBox.placeholder = "Planet is discoverable (invite not needed)";
+                    } else {
+                        inviteBox.disabled = false;
+                        inviteBox.placeholder = "Invite Code Required";
+                    }
+                } catch (err) {
+                    resultBox.innerText = "Error checking discoverability: " + err;
+                }
+            }
+
+            async function joinPlanet() {
+                const token = document.getElementById("token").value;
+                const planetId = document.getElementById("planetId").value;
+                const invite = document.getElementById("inviteCode").value;
+
+                let url = `https://api.valour.gg/api/planets/${planetId}/join`;
+                if (invite) {
+                    url += `?inviteCode=${invite}`;
+                }
+
+                try {
+                    const res = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `${token}`,
+                            accept: "*/*"
+                        },
+                        body: ""
+                    });
+
+                    const text = await res.text();
+                    document.getElementById("result").innerText =
+                        "Status: " + res.status + "\n\n" + text;
+                } catch (err) {
+                    document.getElementById("result").innerText = err;
+                }
+            }
+        </script>
+    </body>
+</html>
