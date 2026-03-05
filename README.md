@@ -51,6 +51,6 @@ This project is not affiliated with, endorsed by, or officially connected to Val
 
 ## License
 
-MIT License — feel free to fork, modify, and redistribute.
+Copyright (c) 2026 SkyJoshua. All rights reserved. See [LICENSE](LICENSE) for details.
 
 &copy; 2026 Valour Planet Joiner
