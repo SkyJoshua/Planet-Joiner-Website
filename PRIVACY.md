@@ -12,7 +12,7 @@ Valour Planet Joiner is a lightweight, client-side web tool for joining planets 
 
 To use this tool, you provide:
 
-- **Bot Token** — your Valour bot's authorisation token
+- **Bot Token** — your Valour bot's authorisation token (THIS IS NOT STORED!!)
 - **Planet ID** — the ID of the planet you wish to join
 - **Invite Code** *(optional)* — an invite code if the planet is not publicly discoverable
 
